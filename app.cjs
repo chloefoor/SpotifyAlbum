@@ -38,5 +38,9 @@ request.post(authOptions, function (error, response, body) {
 console.log('listening on 8888');
 app.listen(8888);
 
+function getToken(){
+  return token;
+}
+
 
 

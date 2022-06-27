@@ -1,11 +1,11 @@
-import app from '../app'; 
+import app from '../app.cjs'; 
 
 var token;
 
 function load(){
-    token = app.token;
+    token = app.getToken();
     document.getElementById('albumsplaceholder').innerHTML = 'submit pressed';
-    document.getElementById('albumsplaceholder').innerHTML += token;
+    //document.getElementById('albumsplaceholder').innerHTML += token;
 }
 
 /*const APIController = (function() {
