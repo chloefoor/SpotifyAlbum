@@ -1,5 +1,11 @@
+import app from '../app'; 
+
+var token;
+
 function load(){
+    token = app.token;
     document.getElementById('albumsplaceholder').innerHTML = 'submit pressed';
+    document.getElementById('albumsplaceholder').innerHTML += token;
 }
 
 /*const APIController = (function() {

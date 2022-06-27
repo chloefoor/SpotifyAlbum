@@ -40,8 +40,3 @@ app.listen(8888);
 
 
 
-function getToken() {
-  return token;
-}
-
-
