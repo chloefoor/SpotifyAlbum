@@ -1,4 +1,4 @@
-import app from '../app.cjs'; 
+import app from '../app.js'; 
 
 var token;
 
