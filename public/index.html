@@ -16,6 +16,10 @@
       white-space: nowrap;
       width: 500px;
     }
+
+    .album{
+      padding: 10px;
+    }
   </style>
 </head>
 
@@ -102,6 +106,8 @@
 
               $('#login').hide();
               $('#loggedin').show();
+              document.body.id = access_token;
+              console.log('access token made id');
             }
           });
         } else {
@@ -113,37 +119,29 @@
 
       const btn = document.getElementById('searchbtn');
       btn.addEventListener('click', function () {
-        console.log('search btn clicked');
         var album = document.getElementById("albumQuery").value;
         var artist = document.getElementById("artistQuery").value;
-        console.log("album: " + album);
-        console.log("artist: " + artist);
-        console.log(access_token);
 
         if(album || artist){
-          //remaster%20track:Doxy+artist:Miles%20Davis
           var q = '';
           //clear error message if there was any before
           document.getElementById('errorMessage').innerHTML = '';
 
           if(album && artist){ //has both album and artist to query
-            console.log('album and artist');
             document.getElementById('albumquerytitle').innerHTML = album + " by " + artist + ": ";
             q='q=artist:' + artist + '+album:' + album;
 
           } else if (album){ //has only album to query
-            console.log('only album');
             document.getElementById('albumquerytitle').innerHTML = album + ": ";
             q='q=album:' + album;
 
           } else if(artist){ //has only artist to query
-            console.log('only artist');
             document.getElementById('albumquerytitle').innerHTML = "Albums by " + artist + ": ";
             q='q=artist:' + artist;
 
           } 
 
-          //ajax call yaya 
+          //ajax call
           $.ajax({
             url: 'https://api.spotify.com/v1/search?type=album&' + q,
             headers: {
@@ -153,8 +151,18 @@
             var albumDiv = document.getElementById('albumplaceholder');
             albumDiv.innerHTML = ''; //clear it out babey!
             for(const album of response.albums.items){
+              var imageurl = album.images[1].url;
+              var albumid = album.id;
+              var albumname = album.name;
+
+              var html = '<img id= ' + albumid + ' class=\'album\' src = ' + imageurl + 
+              ' title= \'' + albumname + '\' >';
               //todo make an album object (?) where if it gets clicked then it will do the pdf thing yeah
-              albumDiv.innerHTML += '<img src = ' + album.images[1].url + '>' ;
+              albumDiv.innerHTML +=  html;
+
+              document.getElementById(albumid).addEventListener('click', function(){
+                console.log('event listener');
+              }, false);
            }
 
             }
@@ -163,13 +171,15 @@
           document.getElementById('errorMessage').innerHTML = 
               '<h4 id=\'warning\'>Please enter either an artist or album</h4>';  
           document.getElementById('albumquerytitle').innerHTML = "";
-          console.log('Please enter either an artist or album');
         }
         
       }, false);
 
     })();
+
+    
   </script>
+
 </body>
 
 </html>
