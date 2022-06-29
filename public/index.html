@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Example of the Authorization Code flow with Spotify</title>
+  <title>Spotify API Fun</title>
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
   <style type="text/css">
     #login,
@@ -22,43 +22,37 @@
 <body>
   <div class="container">
     <div id="login">
-      <h1>This is an example of the Authorization Code flow</h1>
       <a href="/login" class="btn btn-primary">Log in with Spotify</a>
     </div>
+
     <div id="loggedin">
       <div id="user-profile">
       </div>
-      <button class="btn btn-default" id="searchbtn" >Search</button>
+      <button class="btn btn-default" id="searchbtn">Search</button>
       <div id="oauth">
       </div>
-      <button class="btn btn-default" id="obtain-new-token">Obtain new token using the refresh token</button>
     </div>
   </div>
 
   <script id="user-profile-template" type="text/x-handlebars-template" class="loggedin">
       <h1>Welcome!</h1>
-      <input type="text" placeholder="Insert an artist here"></input>
-      <input type="text" placeholder="Insert an album here"></input>
-
-      </div>
+      <input type="text" placeholder="Insert an artist here" id="artistQuery"></input>
+      <input type="text" placeholder="Insert an album here" id="albumQuery"></input>
+      <div id="errorMessage"></div>
     </script>
 
   <script id="oauth-template" type="text/x-handlebars-template">
-      <h2>Albums:</h2>
-      <div id="albumplaceholder"> album placeholder unslay</div>
-      <dl class="dl-horizontal">
-        <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
-        <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
-      </dl>
+      <h2 id="albumquerytitle"></h2>
+      <div id="albumplaceholder"></div>
     </script>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script>
 
-    var accessToken = '';
     //spotify script yeah baby
     (function () {
+
 
       /**
        * Obtains parameters from the hash of the URL
@@ -85,7 +79,6 @@
       var params = getHashParams();
 
       var access_token = params.access_token,
-        accessToken = access_token;
       refresh_token = params.refresh_token,
         error = params.error;
 
@@ -121,11 +114,64 @@
       const btn = document.getElementById('searchbtn');
       btn.addEventListener('click', function () {
         console.log('search btn clicked');
-        document.getElementById('albumplaceholder').innerHTML(access_token);
+        var album = document.getElementById("albumQuery").value;
+        var artist = document.getElementById("artistQuery").value;
+        console.log("album: " + album);
+        console.log("artist: " + artist);
+        console.log(access_token);
+
+        if(album || artist){
+          //remaster%20track:Doxy+artist:Miles%20Davis
+          var q = '';
+          //clear error message if there was any before
+          document.getElementById('errorMessage').innerHTML = '';
+
+          if(album && artist){ //has both album and artist to query
+            console.log('album and artist');
+            document.getElementById('albumquerytitle').innerHTML = album + " by " + artist + ": ";
+            q='q=artist:' + artist + '+album:' + album;
+
+          } else if (album){ //has only album to query
+            console.log('only album');
+            document.getElementById('albumquerytitle').innerHTML = album + ": ";
+            q='q=album:' + album;
+
+          } else if(artist){ //has only artist to query
+            console.log('only artist');
+            document.getElementById('albumquerytitle').innerHTML = "Albums by " + artist + ": ";
+            q='q=artist:' + artist;
+
+          } 
+
+          //ajax call yaya 
+          $.ajax({
+            url: 'https://api.spotify.com/v1/search?type=album&' + q,
+            headers: {
+              'Authorization': 'Bearer ' + access_token
+            },
+            success: function (response) {
+            var albumDiv = document.getElementById('albumplaceholder');
+            albumDiv.innerHTML = ''; //clear it out babey!
+            for(const album of response.albums.items){
+              //todo make an album object (?) where if it gets clicked then it will do the pdf thing yeah
+              albumDiv.innerHTML += '<img src = ' + album.images[1].url + '>' ;
+           }
+
+            }
+          });
+        }else{
+          document.getElementById('errorMessage').innerHTML = 
+              '<h4 id=\'warning\'>Please enter either an artist or album</h4>';  
+          document.getElementById('albumquerytitle').innerHTML = "";
+          console.log('Please enter either an artist or album');
+        }
+        
       }, false);
-      
+
     })();
   </script>
 </body>
 
 </html>
+
+<!-- TODO checkout html2canvas to export image-->
