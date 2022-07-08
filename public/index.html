@@ -20,6 +20,10 @@
     .album{
       padding: 10px;
     }
+
+    .album :hover{
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -157,12 +161,7 @@
 
               var html = '<img id= ' + albumid + ' class=\'album\' src = ' + imageurl + 
               ' title= \'' + albumname + '\' >';
-              //todo make an album object (?) where if it gets clicked then it will do the pdf thing yeah
               albumDiv.innerHTML +=  html;
-
-              document.getElementById(albumid).addEventListener('click', function(){
-                console.log('event listener');
-              }, false);
            }
 
             }
@@ -178,6 +177,14 @@
     })();
 
     
+  </script>
+
+  <script>
+    document.addEventListener('click', function(e){
+      if(e.target && e.target.className == 'album'){
+        console.log('album clicked');
+      }
+    });
   </script>
 
 </body>
